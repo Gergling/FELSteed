@@ -18,6 +18,8 @@ var PackageLoader = function() {
 			return scope.current/scope.batches.length;
 		};
 
+		// TODO: Include location of custom modules e.g. 'module'.
+
 		// TODO: Implement and test console errors where no underscore/backbone is included.
 		scope.batches.push(new PackageBatch("Underscore", [config.underscore]));
 		scope.batches.push(new PackageBatch("Backbone", [config.backbone]));
