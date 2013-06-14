@@ -1,0 +1,1 @@
+combatmodule = {hurrah:{}};

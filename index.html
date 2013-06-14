@@ -1,0 +1,67 @@
+<html>
+	<head>
+		<title>Drone Wars</title>
+
+		<!-- Use the stylesheet provided as an example of how to style the progressbar. -->
+		<link rel="stylesheet" type="text/css" href="vendor/autoload/view/progressbar-style.css" />
+
+		<!-- The requirejs package is needed for the preloader to run.-->
+		<script src="vendor/requirejs/requirejs.js"></script>
+
+		<!-- The guts for loading and event management are handled in this file. -->
+		<script src="vendor/autoload/controller/PackageLoader.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			// This triggers the load sequence.
+			PackageLoader.instance.load({
+				// These frameworks are required for the preloader to run.
+				moduleSrc: "vendor/autoload",
+				jQuery: "https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js",
+				domParent: document.body,
+				underscore: "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js",
+				backbone: "https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js",
+			}, {
+				// These packages are not necessary to the running of the preloader, but have been used in this example.
+				// In this example, base packages 2 is backbone - reliant on the loading of underscore and possibly jquery in base packages 1. Each set of packages begins loading when the previous set has loaded.
+				// The keys act as labels for the listing of currently loading packages.
+				"Base Packages 1": [
+					"https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js",
+					//"https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js",
+				],
+				//"Base Packages 2": [
+					//"https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js",
+				//],
+				// List each module name
+				// Find a neat way to load up each module with appropriate dependencies. Assume backbone-based (so model/view then collection/template).
+				"Router": [
+					"module/application/router/Router.js",
+				],
+				// Load router config
+				// Load modules, including Application
+					// Load various module autoloading scripts.
+					
+				// Maybe have a separate list of modules down here.
+			}, [
+				"combat",
+				"testA",
+				"testB",
+				"testB",
+				"testC",
+				"testD",
+				"testE",
+				"testF",
+				"testG",
+			], function() {
+				// On load, this function is run. This could be used to load a single-page app.
+				$('body').html("Ta-da!");
+				
+				// Load up the main layout view, and by extension the template.
+				// Show it on the screen.
+				// Run the router
+				Router.instance = new Router();
+				Backbone.history.start();
+			});
+		</script>
+	</body>
+</html>

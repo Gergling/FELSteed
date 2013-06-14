@@ -1,0 +1,23 @@
+{
+	"dependencies": [
+	],
+	"models": [
+		"model"
+	],
+	"collections": [
+	],
+	"views": [
+	],
+	"templates": [
+	],
+	"special": {
+		"preModule": [
+		],
+		"preModelView": [
+		],
+		"preCollectionTemplate": [
+		],
+		"postModule": [
+		]
+	}
+}

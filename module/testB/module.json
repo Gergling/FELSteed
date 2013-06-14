@@ -1,0 +1,25 @@
+{
+	"dependencies": [
+		"testC",
+		"testD",
+		"testE"
+	],
+	"models": [
+	],
+	"collections": [
+	],
+	"views": [
+	],
+	"templates": [
+	],
+	"special": {
+		"preModule": [
+		],
+		"preModelView": [
+		],
+		"preCollectionTemplate": [
+		],
+		"postModule": [
+		]
+	}
+}
