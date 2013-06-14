@@ -53,10 +53,13 @@ var ModuleCollection = function() {
 		var batch = [];
 		if (this.hasBatch(batchIDX)) {
 			$.each(this.batches[batchIDX], function(moduleName, module) {
-				//batch = $.extend(batch, module.getLoadBatches());
-				console.log(module.getLoadBatches());
+				//console.log(module.getLoadBatches());
 				// Need to handle each sub-batch
-				batch = batch.concat(module.getLoadBatches());
+				batch = batch.concat(module.getLoadBatches().preModule);
+				batch = batch.concat(module.getLoadBatches().modelView);
+				batch = batch.concat(module.getLoadBatches().preCollectionTemplate);
+				batch = batch.concat(module.getLoadBatches().collectionTemplate);
+				batch = batch.concat(module.getLoadBatches().postModule);
 			});
 		} else {
 			// TODO: Throw an exception

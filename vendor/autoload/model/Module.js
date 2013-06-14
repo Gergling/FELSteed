@@ -8,8 +8,9 @@ var Module = function(def) {
 	this.name = def.name;
 	this.dependents = {};
 	this.dependencies = {};
-	this.batch;
+	this.batch = 0;
 	this.loadIndex = 0;
+	this.loadBatches;
 	this.loadConfig = function(complete) {
 		// jQuery should be loaded by now.
 		var scope = this;
@@ -30,29 +31,6 @@ var Module = function(def) {
 			console.error("Module Config Load Error '"+scope.name+"':", msg);
 		});
 	};
-	/*this.loadModule = function(complete) {
-		var batches = this.getLoadBatches();
-		// TODO: Find an alternative to the deep-indentation pattern, perhaps one which expresses the module components loading better.
-		var scope = this;
-		this.loadBatch(batches.preModule, function() {
-			scope.loadBatch(batches.modelView, function() {
-				scope.loadBatch(batches.preCollectionTemplate, function() {
-					scope.loadBatch(batches.collectionTemplate, function() {
-						scope.loadBatch(batches.postModule, function() {
-							complete();
-						});
-					});
-				});
-			});
-		});
-	};
-	this.loadBatch = function(batch, complete) {
-		if (batch.length) {
-			requirejs(batch, complete);
-		} else {
-			complete();
-		}
-	};*/
 	this.getLoadBatches = function() {
 		var scope = this;
 		var batches = {};
@@ -167,12 +145,12 @@ var Module = function(def) {
 	this.assignDependency = function(module) {
 		this.dependencies[module.getName()] = module;
 	};
-	this.assignBatch = function(dependentBatchNumber) {
+	/*this.assignBatch = function(dependentBatchNumber) {
 		this.batch = {
 			first: dependentBatchNumber-2,
 			second: dependentBatchNumber-1,
 		};
-	};
+	};*/
 	this.getBatch = function() {
 		return this.batch;
 	};
