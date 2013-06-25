@@ -79,7 +79,9 @@ var PackageLoader = function() {
 			//console.log(3);
 			scope.modules.loadModules(function() {
 				$(function() {
-					scope.onload();
+					scope.modules.loadModuleTemplates(function() {
+						scope.onload();
+					})
 				});
 			});
 		});

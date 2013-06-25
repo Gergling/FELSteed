@@ -29,15 +29,17 @@ var ModuleCollection = function() {
 	this.loadModules = function(complete) {
 		this.assignDependencies();
 		this.setLoadIndexOrder();
-		console.log("load indexes", this.loadIndexes);
 		this.loadCurrentBatch(complete);
 	};
 	this.loadCurrentBatch = function(complete) {
 		var scope = this;
 		if (this.hasBatch(this.currentBatch)) {
 			var batch = this.getBatch(this.currentBatch);
-			console.log("current batch", this.currentBatch, batch);
-			requirejs(batch, function() {
+			/*requirejs(batch, function() {
+				scope.currentBatch++;
+				scope.loadCurrentBatch(complete);
+			});*/
+			this.loadSubBatch(batch, function() {
 				scope.currentBatch++;
 				scope.loadCurrentBatch(complete);
 			});
@@ -46,20 +48,45 @@ var ModuleCollection = function() {
 			complete();
 		}
 	};
+	this.subBatchOrder = [
+		"preModule",
+		"modelView",
+		"preCollectionTemplate",
+		"collection",
+		"postModule",
+	];
+	this.currentSubBatch = 0;
+	this.loadSubBatch = function(batch, complete) {
+		var scope = this;
+		var subBatchName = this.subBatchOrder[this.currentSubBatch];
+		if (this.currentSubBatch<this.subBatchOrder.length) {
+			var oncomplete = function() {
+				scope.currentSubBatch++;
+				scope.loadSubBatch(batch, complete);
+			};
+			if (batch[subBatchName] && batch[subBatchName].length) {
+				requirejs(batch[subBatchName], oncomplete);
+			} else {
+				oncomplete();
+			}
+		} else {
+			complete();
+		}
+	};
 	this.hasBatch = function(batchIDX) {
 		return this.batches[batchIDX];
 	};
 	this.getBatch = function(batchIDX) {
-		var batch = [];
+		var batch = {};
+		var scope = this;
 		if (this.hasBatch(batchIDX)) {
 			$.each(this.batches[batchIDX], function(moduleName, module) {
-				//console.log(module.getLoadBatches());
-				// Need to handle each sub-batch
-				batch = batch.concat(module.getLoadBatches().preModule);
-				batch = batch.concat(module.getLoadBatches().modelView);
-				batch = batch.concat(module.getLoadBatches().preCollectionTemplate);
-				batch = batch.concat(module.getLoadBatches().collectionTemplate);
-				batch = batch.concat(module.getLoadBatches().postModule);
+				$.each(scope.subBatchOrder, function(idx, subBatchName) {
+					// Need to handle each sub-batch
+					var subBatch = batch[subBatchName] || [];
+					subBatch = subBatch.concat(module.getLoadBatches()[subBatchName]);
+					batch[subBatchName] = subBatch;
+				});
 			});
 		} else {
 			// TODO: Throw an exception
@@ -72,6 +99,22 @@ var ModuleCollection = function() {
 		this.update();
 		if (this.totalConfigsLoaded>=this.length()) {
 			this.complete();
+		}
+	};
+	this.loadModuleTemplates = function(loadedFunction) {
+		var scope = this;
+		// Loaded function will include completion function if all modules are fully loaded.
+		$.each(this.modules, function(moduleName, module) {
+			module.initiateTemplateLoads(function() {
+				scope.loadedModuleTemplates.push(moduleName);
+				scope.loadTemplateModuleComplete(loadedFunction);
+			});
+		});
+	};
+	this.loadedModuleTemplates = [];
+	this.loadTemplateModuleComplete = function(loadedFunction) {
+		if (this.loadedModuleTemplates.length>=this.length()) {
+			loadedFunction();
 		}
 	};
 	this.length = function() {

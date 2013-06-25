@@ -5,10 +5,12 @@
 		"model"
 	],
 	"collections": [
+		"collection"
 	],
 	"views": [
 	],
 	"templates": [
+		"sometemplate"
 	],
 	"special": {
 		"preModule": [

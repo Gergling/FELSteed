@@ -9,6 +9,7 @@ var Module = function(def) {
 	this.dependents = {};
 	this.dependencies = {};
 	this.batch = 0;
+	this.templateLoadStatus = [];
 	this.loadIndex = 0;
 	this.loadBatches;
 	this.loadConfig = function(complete) {
@@ -48,7 +49,6 @@ var Module = function(def) {
 			batches.modelView = [];
 			if (this.config.models) {
 				$.each(this.config.models, function(idx, modelName) {
-					console.log(modelName, scope.getComponentPath("model", modelName));
 					batches.modelView.push(scope.getComponentPath("model", modelName));
 				});
 			}
@@ -67,30 +67,74 @@ var Module = function(def) {
 			});
 		}
 
-		// Collections/Templates
-		if (this.config.collections || this.config.templates) {
-			batches.collectionTemplate = [];
+		// Collections
+		if (this.config.collections) {
+			batches.collection = [];
 			if (this.config.collections) {
 				$.each(this.config.collections, function(idx, moduleName) {
-					batches.collectionTemplate.push(scope.getComponentPath("model", moduleName));
+					batches.collection.push(scope.getComponentPath("model", moduleName));
 				});
 			}
-			if (this.config.templates) {
+			/*if (this.config.templates) {
+				// This needs to go in separately from collections, as templates are html and will need ajax.
 				$.each(this.config.templates, function(idx, moduleName) {
-					batches.collectionTemplate.push(scope.getComponentPath("view", moduleName));
+					batches.template.push(scope.getComponentPath("view", moduleName));
 				});
-			}
+			}*/
 		}
 
 		// Post-Module
-		if (this.config.special && this.config.special.postModule) {
+		// Get the critical template-loading working first, then we can come back to these.
+		/*if (this.config.special && this.config.special.postModule) {
 			batches.postModule = [];
 			$.each(this.config.special.postModule, function(idx, path) {
 				batches.postModule.push(path);
 			});
-		}
+		}*/
 
 		return batches;
+	};
+	this.initiateTemplateLoads = function(loadedFunction) {
+		var scope = this;
+		// Templates
+		if (this.config.templates && this.config.templates.length) {
+			$.each(this.config.templates, function(idx, templateName) {
+				// Create html container in head, id'd after module/name combination.
+				var templateContainer = $("<script>")
+					.attr("type", "text/template")
+					.attr("id", scope.getTemplateId(templateName))
+					.load(scope.getTemplatePath(templateName), function(response, status, xhr) {
+						// Update a template load status listing of some kind.
+						scope.setTemplateLoadStatus(templateName);
+						// Run a function which checks template loadings.
+						// If they're all loaded, run complete.
+						if (scope.hasAllTemplatesLoaded()) {
+							loadedFunction();
+						}
+					})
+				;
+				$('head').append(templateContainer);
+				// Ajax html template into container.
+			});
+		} else {
+			loadedFunction();
+		}
+	};
+	this.setTemplateLoadStatus = function(templateName) {
+		this.templateLoadStatus.push(templateName); 
+	};
+	this.hasAllTemplatesLoaded = function() {
+		if (this.config.templates && this.config.templates.length) {
+			return this.config.templates.length==this.templateLoadStatus.length;
+		} else {
+			return true;
+		}
+	};
+	this.getTemplateId = function(templateName) {
+		return this.name+"-"+templateName;
+	};
+	this.getTemplatePath = function(templateName) {
+		return this.modulePath+"/view/"+templateName+".html";
 	};
 	this.getComponentPath = function(type, name) {
 		var path = "";
@@ -145,12 +189,6 @@ var Module = function(def) {
 	this.assignDependency = function(module) {
 		this.dependencies[module.getName()] = module;
 	};
-	/*this.assignBatch = function(dependentBatchNumber) {
-		this.batch = {
-			first: dependentBatchNumber-2,
-			second: dependentBatchNumber-1,
-		};
-	};*/
 	this.getBatch = function() {
 		return this.batch;
 	};
