@@ -2,7 +2,8 @@
 
 var Module = function(def) {
 	this.config;
-	this.modulePath = def.modulePath;
+	this.root = def.root || "";
+	this.modulePath = this.root+"/"+def.modulePath;
 	this.configFile = def.configFile;
 	this.configPath = this.modulePath+"/"+this.configFile;
 	this.name = def.name;

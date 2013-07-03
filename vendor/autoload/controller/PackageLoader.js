@@ -12,8 +12,9 @@ var PackageLoader = function() {
 		var scope = this;
 
 		// Config defaults
+		config.root = config.root || "";
 		config.moduleSrc = config.moduleSrc || "vendor/autoload";
-		config.preloader = config.moduleSrc+"/view/PackagePreloader.js",
+		config.preloader = config.root+ "/" + config.moduleSrc+"/view/PackagePreloader.js",
 		config.currentProgress = function() {
 			return scope.current/scope.batches.length;
 		};
@@ -34,10 +35,10 @@ var PackageLoader = function() {
 			requirejs([
 				config.preloader,
 				config.jQuery,
-				config.moduleSrc + "/model/Module.js",
-				config.moduleSrc + "/model/ModuleCollection.js",
+				config.root+ "/" + config.moduleSrc + "/model/Module.js",
+				config.root+ "/" + config.moduleSrc + "/model/ModuleCollection.js",
 			], function() {
-				scope.modules = new ModuleCollection();
+				scope.modules = new ModuleCollection({root: config.root});
 				scope.modules.setModules(modules);
 
 				//PackagePreloader.instance.init(config);

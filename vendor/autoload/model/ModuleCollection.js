@@ -1,17 +1,19 @@
 // TODO: Base on Backbone if still available.
 
-var ModuleCollection = function() {
+var ModuleCollection = function(config) {
 	this.modules = {};
 	this.loadIndexes = {};
 	this.totalConfigsLoaded = 0;
 	this.batches = {};
 	this.currentBatch = 1;
+	this.root = config.root || "";
 	this.setModules = function(modules) {
 		var scope = this;
 		for(var idx in modules) {
 			var name = modules[idx];
 			this.modules[name] = new Module({
 				name: name,
+				root: this.root,
 				configFile: "module.json",
 				modulePath: "module/"+name,
 			});
